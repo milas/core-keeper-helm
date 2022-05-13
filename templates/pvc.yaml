@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ template "core-keeper.fullname" . }}-world
+  labels:
+    {{- include "core-keeper.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    {{- toYaml .Values.coreKeeper.persistence.resources | nindent 4 }}
+  {{- if not (empty .Values.coreKeeper.persistence.storageClassName) }}
+  storageClassName: {{ .Values.coreKeeper.persistence.storageClassName }}
+  {{- end }}

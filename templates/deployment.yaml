@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "core-keeper.fullname" . }}
+  labels:
+    {{- include "core-keeper.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "core-keeper.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "core-keeper.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "core-keeper.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: WORLD_NAME
+              value: {{ .Values.coreKeeper.worldName }}
+            - name: WORLD_SEED
+              value: {{ .Values.coreKeeper.worldSeed | quote }}
+            - name: MAX_PLAYERS
+              value: {{ .Values.coreKeeper.maxPlayers | quote }}
+          volumeMounts:
+            - name: world
+              mountPath: /data
+          readinessProbe:
+            exec:
+              command:
+                - test
+                - -f
+                - GameID.txt
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: world
+          persistentVolumeClaim:
+            claimName: {{ template "core-keeper.fullname" . }}-world
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
