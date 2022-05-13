@@ -2,7 +2,7 @@
 Helm chart for running a dedicated [Core Keeper][core-keeper] server on Kubernetes
 
 ## Status
-⚠️ Experimental
+⚠ Experimental
 
 ## Values
 | Name                                      | Description                                        | Default                                            |
@@ -28,6 +28,11 @@ Then, override the `image.tag` value with a `values.yaml` or `--set image.tag=..
 Do this at your own risk, as there might be breaking changes in the image that require chart upgrades!
 
 ## Install
+
+> **⚠ Helm v3.8.0+ is recommended!**
+>
+> Older versions might work with the `HELM_EXPERIMENTAL_OCI=1` environment variable set
+
 ```shell
 helm -n core-keeper \
   install \
