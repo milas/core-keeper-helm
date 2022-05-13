@@ -1,0 +1,35 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Login to GHCR
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: 3.*
+
+      - name: Package Chart
+        run: helm package . -d ./out
+
+      - name: Publish Chart
+        run: helm push ./out/core-keeper-*.tgz oci://ghcr.io/${GITHUB_REPOSITORY_OWNER}/charts
