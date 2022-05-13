@@ -15,3 +15,20 @@ Helm chart for running a dedicated Core Keeper server on Kubernetes
 | `coreKeeper.persistence.resources`        | Requests/limits for persistent data volume         | <pre lang="yaml">requests:<br>  storage: 1GiB</pre> |
 | `coreKeeper.persistence.storageClassName` | Storage class for PVC (optional)                   |                                                     |
 | `vpa.enabled`                             | Create VerticalPodAutoscaler recommender policy    | false                                               |
+
+## Install
+```shell
+helm -n core-keeper \
+  install \
+    core-keeper \
+    oci://ghcr.io/milas/charts/core-keeper \
+    --create-namespace
+```
+
+## Upgrade
+```shell
+helm -n core-keeper \
+  upgrade \
+    core-keeper \
+    oci://ghcr.io/milas/charts/core-keeper
+```
